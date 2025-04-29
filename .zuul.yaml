@@ -1,12 +1,3 @@
-
-- job:
-    name: chart-vendor-golangci-lint
-    parent: golangci-lint
-    vars:
-      go_version: 1.23.1
-      golangci_lint_version: 1.61.0
-      golangci_lint_options: --timeout=5m
-
 - job:
     name: chart-vendor
     parent: golang-go
@@ -17,12 +8,3 @@
       - vexxhost/chart-vendor
     vars:
       go_version: 1.23.1
-
-- project:
-    merge-mode: squash-merge
-    check:
-      jobs:
-        - chart-vendor-golangci-lint
-    gate:
-      jobs:
-        - chart-vendor-golangci-lint
