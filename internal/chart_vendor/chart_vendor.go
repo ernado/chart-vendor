@@ -35,7 +35,11 @@ func Patch(logger *slog.Logger, input, directory string) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(includefiles.Name())
+	defer func() {
+    if err := os.Remove(includefiles.Name()); err != nil {
+        logger.With("error", err).Error("failed to remove temporary include file")
+    }
+	}()
 	_, err = includefiles.WriteString(strings.Join(includes, "\n"))
 	if err != nil {
 		return err
@@ -45,7 +49,11 @@ func Patch(logger *slog.Logger, input, directory string) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(excludefiles.Name())
+	defer func() {
+    if err := os.Remove(excludefiles.Name()); err != nil {
+        logger.With("error", err).Error("failed to remove temporary exclude file")
+    }
+	}()
 	_, err = excludefiles.WriteString(strings.Join(excludes, "\n"))
 	if err != nil {
 		return err
@@ -61,7 +69,11 @@ func Patch(logger *slog.Logger, input, directory string) error {
 	}
 
 	go func() {
-		defer stdin.Close()
+    defer func() {
+				if err := stdin.Close(); err != nil {
+						logger.With("error", err).Error("failed to close stdin")
+				}
+		}()
 		_, err = io.WriteString(stdin, input)
 	}()
 
