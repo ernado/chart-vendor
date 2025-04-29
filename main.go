@@ -5,16 +5,17 @@ import (
 	"log"
 	"os"
 	"slices"
+	"context"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"github.com/vexxhost/chart-vendor/internal/chart_vendor"
 	"github.com/vexxhost/chart-vendor/internal/config"
 	"golang.org/x/sync/errgroup"
 )
 
 func main() {
-	app := &cli.App{
+	app := &cli.Command{
 		Name: "Chart Vendor CLI",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -33,8 +34,8 @@ func main() {
 				Value: false,
 			},
 		},
-		Action: func(ctx *cli.Context) error {
-			configFile := ctx.String("config-file")
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			configFile := cmd.String("config-file")
 
 			parsedConfig, err := config.ParseFromFile(configFile)
 			if err != nil {
@@ -42,7 +43,7 @@ func main() {
 			}
 
 			g := errgroup.Group{}
-			selectedCharts := ctx.Args().Slice()
+			selectedCharts := cmd.Args().Slice()
 
 			for _, chart := range parsedConfig.Charts {
 				if len(selectedCharts) != 0 && !slices.Contains(selectedCharts, chart.Name) {
@@ -50,7 +51,7 @@ func main() {
 				}
 
 				g.Go(func() error {
-					return chart_vendor.FetchChart(chart, ctx.String("charts-root"))
+					return chart_vendor.FetchChart(chart, cmd.String("charts-root"))
 				})
 			}
 
@@ -59,7 +60,7 @@ func main() {
 				return err
 			}
 
-			if ctx.Bool("check") {
+			if cmd.Bool("check") {
 				repo, err := git.PlainOpen(".")
 				if err != nil {
 					return err
@@ -100,7 +101,7 @@ func main() {
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
+	if err := app.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
