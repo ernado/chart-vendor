@@ -1,0 +1,20 @@
+name: chart-vendor
+description: Ensure all charts are vendored with all the patches.
+
+inputs:
+  config-file:
+    description: Configuration file for the vendored charts
+    default: .charts.yaml
+  charts-root:
+    description: Root path where charts are generated
+    default: charts
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+    - shell: bash
+      working-directory: ${{ env.GITHUB_ACTION_PATH }}
+      run: go run main.go --config-file ${{ inputs.config-file }} --charts-root ${{ inputs.charts-root }} --check
