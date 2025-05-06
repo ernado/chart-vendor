@@ -21,5 +21,7 @@ runs:
       with:
         go-version-file: go.mod
     - shell: bash
-      working-directory: ${{ github.action_path }}
-      run: go run main.go --config-file ${{ inputs.working-directory }}/${{ inputs.config-file }} --charts-root ${{ inputs.working-directory }}/${{ inputs.charts-root }} --check
+      run: go install
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: chart-vendor --config-file ${{ inputs.config-file }} --charts-root ${{ inputs.charts-root }} --check
