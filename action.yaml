@@ -7,7 +7,7 @@ inputs:
     default: ${{ github.workspace }}
   config-file:
     description: Configuration file for the vendored charts
-    default: .charts.yaml
+    default: .charts.yml
   charts-root:
     description: Root path where charts are generated
     default: charts
