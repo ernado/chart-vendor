@@ -16,5 +16,5 @@ runs:
       with:
         go-version-file: go.mod
     - shell: bash
-      working-directory: ${{ env.GITHUB_ACTION_PATH }}
+      working-directory: ${{ github.action_path }}
       run: go run main.go --config-file ${{ inputs.config-file }} --charts-root ${{ inputs.charts-root }} --check
