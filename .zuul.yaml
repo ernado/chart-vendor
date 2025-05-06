@@ -8,3 +8,11 @@
       - vexxhost/chart-vendor
     vars:
       go_version: 1.23.1
+
+- project:
+    check:
+      jobs:
+        - noop
+    gate:
+      jobs:
+        - noop
