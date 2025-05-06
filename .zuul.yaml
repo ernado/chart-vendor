@@ -10,6 +10,7 @@
       go_version: 1.23.1
 
 - project:
+    merge-mode: squash-merge
     check:
       jobs:
         - noop
