@@ -21,6 +21,7 @@ runs:
       with:
         go-version-file: go.mod
     - shell: bash
+      working-directory: ${{ github.action_path }}
       run: go install
     - shell: bash
       working-directory: ${{ inputs.working-directory }}
