@@ -2,6 +2,9 @@ name: chart-vendor
 description: Ensure all charts are vendored with all the patches.
 
 inputs:
+  working-directory:
+    description: Path to the working directory
+    default: ${{ github.workspace }}
   config-file:
     description: Configuration file for the vendored charts
     default: .charts.yaml
@@ -17,4 +20,4 @@ runs:
         go-version-file: go.mod
     - shell: bash
       working-directory: ${{ github.action_path }}
-      run: go run main.go --config-file ${{ inputs.config-file }} --charts-root ${{ inputs.charts-root }} --check
+      run: go run main.go --config-file ${{ inputs.working-directory }}/${{ inputs.config-file }} --charts-root ${{ inputs.working-directory }}/${{ inputs.charts-root }} --check
