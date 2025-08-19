@@ -1,6 +1,6 @@
 module github.com/vexxhost/chart-vendor
 
-go 1.23.1
+go 1.24.6
 
 require (
 	github.com/andygrunwald/go-gerrit v1.1.0
