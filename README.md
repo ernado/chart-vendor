@@ -15,7 +15,7 @@ First, clone the repository and build the binary:
 
 ```bash
 Copy code
-git clone https://github.com/vexxhost/chart-vendor.git
+git clone https://github.com/ernado/chart-vendor.git
 cd chart-vendor
 go build -o chart-vendor .
 ```

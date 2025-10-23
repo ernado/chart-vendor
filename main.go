@@ -7,10 +7,10 @@ import (
 	"os"
 	"slices"
 
+	vendor "github.com/ernado/chart-vendor/internal/chartvendor"
+	"github.com/ernado/chart-vendor/internal/config"
 	"github.com/go-git/go-git/v5"
 	"github.com/urfave/cli/v3"
-	"github.com/vexxhost/chart-vendor/internal/chart_vendor"
-	"github.com/vexxhost/chart-vendor/internal/config"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -51,7 +51,7 @@ func main() {
 				}
 
 				g.Go(func() error {
-					return chart_vendor.FetchChart(chart, cmd.String("charts-root"))
+					return vendor.FetchChart(chart, cmd.String("charts-root"))
 				})
 			}
 

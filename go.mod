@@ -1,4 +1,4 @@
-module github.com/vexxhost/chart-vendor
+module github.com/ernado/chart-vendor
 
 go 1.24.6
 
