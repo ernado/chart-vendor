@@ -7,8 +7,8 @@ import (
 	"os"
 	"slices"
 
-	vendor "github.com/ernado/chart-vendor/internal/chartvendor"
-	"github.com/ernado/chart-vendor/internal/config"
+	vendor "github.com/ernado/chart-vendor/chartvendor"
+	"github.com/ernado/chart-vendor/config"
 	"github.com/go-git/go-git/v5"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/sync/errgroup"
