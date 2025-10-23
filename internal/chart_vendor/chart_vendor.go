@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/andygrunwald/go-gerrit"
+	"go.uber.org/multierr"
 	"golang.org/x/sync/errgroup"
 	"sigs.k8s.io/yaml"
 
@@ -36,9 +37,9 @@ func Patch(logger *slog.Logger, input, directory string) error {
 		return err
 	}
 	defer func() {
-    if err := os.Remove(includefiles.Name()); err != nil {
-        logger.With("error", err).Error("failed to remove temporary include file")
-    }
+		if err := os.Remove(includefiles.Name()); err != nil {
+			logger.With("error", err).Error("failed to remove temporary include file")
+		}
 	}()
 	_, err = includefiles.WriteString(strings.Join(includes, "\n"))
 	if err != nil {
@@ -50,9 +51,9 @@ func Patch(logger *slog.Logger, input, directory string) error {
 		return err
 	}
 	defer func() {
-    if err := os.Remove(excludefiles.Name()); err != nil {
-        logger.With("error", err).Error("failed to remove temporary exclude file")
-    }
+		if err := os.Remove(excludefiles.Name()); err != nil {
+			logger.With("error", err).Error("failed to remove temporary exclude file")
+		}
 	}()
 	_, err = excludefiles.WriteString(strings.Join(excludes, "\n"))
 	if err != nil {
@@ -69,10 +70,10 @@ func Patch(logger *slog.Logger, input, directory string) error {
 	}
 
 	go func() {
-    defer func() {
-				if err := stdin.Close(); err != nil {
-						logger.With("error", err).Error("failed to close stdin")
-				}
+		defer func() {
+			if err := stdin.Close(); err != nil {
+				logger.With("error", err).Error("failed to close stdin")
+			}
 		}()
 		_, err = io.WriteString(stdin, input)
 	}()
@@ -134,33 +135,33 @@ func Patch(logger *slog.Logger, input, directory string) error {
 }
 
 func PatchFromFiles(logger *slog.Logger, name string, path string, directory string) error {
-    patchesPath := fmt.Sprintf("%s/patches/%s", path, name)
-    if _, err := os.Stat(patchesPath); err == nil {
-        patches, err := filepath.Glob(
-            fmt.Sprintf("%s/*.patch", patchesPath),
-        )
-        if err != nil {
-            return err
-        }
+	patchesPath := fmt.Sprintf("%s/patches/%s", path, name)
+	if _, err := os.Stat(patchesPath); err == nil {
+		patches, err := filepath.Glob(
+			fmt.Sprintf("%s/*.patch", patchesPath),
+		)
+		if err != nil {
+			return err
+		}
 
-        sort.Strings(patches)
+		sort.Strings(patches)
 
-        for _, patch := range patches {
-            logger = logger.With("patch", patch)
+		for _, patch := range patches {
+			logger = logger.With("patch", patch)
 
-            patchData, err := os.ReadFile(patch)
-            if err != nil {
-                return err
-            }
+			patchData, err := os.ReadFile(patch)
+			if err != nil {
+				return err
+			}
 
-            logger.Info("applying patch")
-            err = Patch(logger, string(patchData), fmt.Sprintf("%s/%s", path, directory))
-            if err != nil {
-                return err
-            }
-        }
-    }
-    return nil
+			logger.Info("applying patch")
+			err = Patch(logger, string(patchData), fmt.Sprintf("%s/%s", path, directory))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func FetchChart(chart config.Chart, path string) error {
@@ -203,7 +204,7 @@ func FetchChart(chart config.Chart, path string) error {
 			fmt.Sprintf("%s/%s", path, directory),
 		)
 		if nerr != nil {
-			return nerr
+			err = multierr.Append(err, nerr)
 		}
 
 		return err

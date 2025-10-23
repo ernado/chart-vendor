@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-faster/errors"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli"
@@ -34,7 +35,7 @@ func FetchChart(repoURL, name, version, path, directory string) error {
 		"", "", "", getters,
 	)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "find chart in repo url")
 	}
 
 	dl := downloader.ChartDownloader{
@@ -44,19 +45,23 @@ func FetchChart(repoURL, name, version, path, directory string) error {
 		Getters: getters,
 	}
 
+	if err := os.MkdirAll(path, 0755); err != nil {
+		return errors.Wrap(err, "create chart path")
+	}
+
 	chartPath, _, err := dl.DownloadTo(url, version, path)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "download chart")
 	}
 
 	err = chartutil.ExpandFile(path, chartPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "expand chart file")
 	}
 
 	err = os.Remove(chartPath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "remove chart archive")
 	}
 
 	if name != directory {
@@ -65,7 +70,7 @@ func FetchChart(repoURL, name, version, path, directory string) error {
 			fmt.Sprintf("%s/%s", path, directory),
 		)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "rename chart directory")
 		}
 	}
 
@@ -79,12 +84,12 @@ func UpdateRequirementsLock(path string, req []*chart.Dependency) error {
 
 	data, err := json.Marshal([2][]*chart.Dependency{req, req})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "marshal dependencies")
 	}
 
 	digest, err := provenance.Digest(bytes.NewBuffer(data))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "compute digest")
 	}
 
 	lock := &chart.Lock{
@@ -95,8 +100,12 @@ func UpdateRequirementsLock(path string, req []*chart.Dependency) error {
 
 	ldata, err := yaml.Marshal(lock)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "marshal lock")
 	}
 
-	return os.WriteFile(path, ldata, 0644)
+	if err := os.WriteFile(path, ldata, 0644); err != nil {
+		return errors.Wrap(err, "write lock file")
+	}
+
+	return nil
 }
